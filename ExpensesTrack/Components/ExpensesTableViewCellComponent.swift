@@ -13,9 +13,8 @@ class ExpensesTableViewCellComponent: UITableViewCell {
         let variable = UIStackView()
         variable.translatesAutoresizingMaskIntoConstraints = false
         variable.axis = .horizontal
-        variable.isLayoutMarginsRelativeArrangement = true
-        variable.layoutMargins = .init(top: 8.0, left: 16.0, bottom: 16.0, right: 16.0)
-        variable.spacing = 10
+        variable.spacing = 20
+        variable.alignment = .fill
         variable.distribution = .fill
         return variable
     }()
@@ -25,7 +24,15 @@ class ExpensesTableViewCellComponent: UITableViewCell {
         variable.translatesAutoresizingMaskIntoConstraints = false
         variable.axis = .vertical
         variable.alignment = .leading
-        variable.distribution = .fillProportionally
+        variable.alignment = .fill
+        variable.spacing = 5
+        return variable
+    }()
+    
+    private lazy var stackImage: UIStackView = {
+        let variable = UIStackView()
+        variable.translatesAutoresizingMaskIntoConstraints = false
+        variable.axis = .vertical
         return variable
     }()
     
@@ -40,11 +47,11 @@ class ExpensesTableViewCellComponent: UITableViewCell {
     private lazy var expenseImageView: UIImageView = {
         let variable = UIImageView()
         variable.translatesAutoresizingMaskIntoConstraints = false
-        variable.backgroundColor = UIColor.ligthGray
-        variable.layer.cornerRadius = 25
+        variable.backgroundColor = UIColor.textColorTerciary
+        variable.layer.cornerRadius = 20
         variable.clipsToBounds = true
-        variable.heightAnchor.constraint(equalToConstant: 50.0).isActive = true
-        variable.widthAnchor.constraint(equalToConstant: 50.0).isActive = true
+        variable.heightAnchor.constraint(equalToConstant: 40.0).isActive = true
+        variable.widthAnchor.constraint(equalToConstant: 40.0).isActive = true
         return variable
     }()
 
@@ -59,7 +66,7 @@ class ExpensesTableViewCellComponent: UITableViewCell {
     }()
     
     private lazy var valueLabel: UILabel = {
-        let variable = UILabel().labelTextSecondary()
+        let variable = UILabel().labelTextPrimary()
         return variable
     }()
     
@@ -76,10 +83,13 @@ class ExpensesTableViewCellComponent: UITableViewCell {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: topAnchor),
-            stack.leadingAnchor.constraint(equalTo: leadingAnchor),
-            stack.trailingAnchor.constraint(equalTo: trailingAnchor),
-            stack.bottomAnchor.constraint(equalTo: bottomAnchor)
+            stack.topAnchor.constraint(equalTo: topAnchor, constant: 16.0),
+            stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16.0),
+            stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16.0),
+            stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16.0),
+            stack.centerXAnchor.constraint(equalTo: centerXAnchor),
+            stack.centerYAnchor.constraint(equalTo: centerYAnchor),
+            stack.heightAnchor.constraint(equalToConstant: 40),
         ])
     }
     
@@ -90,7 +100,9 @@ class ExpensesTableViewCellComponent: UITableViewCell {
         stackValueAndCreatedAt.addArrangedSubview(valueLabel)
         stackValueAndCreatedAt.addArrangedSubview(createdAtLabel)
         
-        stack.addArrangedSubview(expenseImageView)
+        stackImage.addArrangedSubview(expenseImageView)
+        
+        stack.addArrangedSubview(stackImage)
         stack.addArrangedSubview(stackTitleAndCategory)
         stack.addArrangedSubview(stackValueAndCreatedAt)
     }
@@ -108,7 +120,7 @@ class ExpensesTableViewCellComponent: UITableViewCell {
     func configureCell(expense: Expense) {
         titleLabel.text = expense.title
         categoryLabel.text = expense.category
-        valueLabel.text = "R$ " + FormatterUtil.numberFormatter(number: expense.value)
+        valueLabel.text = FormatterUtil.numberFormatter(number: expense.value)
         createdAtLabel.text = FormatterUtil.dateFormatter(date: expense.createdAt)
     }
 }

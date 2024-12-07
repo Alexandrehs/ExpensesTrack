@@ -6,7 +6,7 @@
 //
 
 class AssetsConstants {
-    static var ligthGray: String = "LigthGray"
+    static var appColor: String = "AppColor"
     static var textColorPrimary: String = "TextColorPrimary"
     static var textColorSecondary: String = "TextColorSecondary"
     static var textColorTerciary: String = "TextColorTerciary"

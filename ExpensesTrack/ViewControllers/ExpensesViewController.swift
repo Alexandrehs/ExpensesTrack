@@ -9,16 +9,48 @@ import UIKit
 
 protocol ExpensesViewControllerDelegate: AnyObject {
     func addExpense()
+    func updateTotal()
 }
 
 class ExpensesViewController: UIViewController {
     private var repository: ExpenseRepository
+    private var totalExpenses: String = ""
+    
+    private lazy var stackBalanceInfo: UIStackView = {
+        let variable = UIStackView()
+        variable.translatesAutoresizingMaskIntoConstraints = false
+        variable.axis = .horizontal
+        variable.backgroundColor = UIColor.app
+        variable.isLayoutMarginsRelativeArrangement = true
+        variable.layoutMargins = .init(top: 16.0, left: 16.0, bottom: 16.0, right: 16.0)
+        return variable
+    }()
+    
+    private lazy var stackBalance: UIStackView = {
+        let variable = UIStackView()
+        variable.translatesAutoresizingMaskIntoConstraints = false
+        variable.axis = .vertical
+        variable.spacing = 10.0
+        return variable
+    }()
+    
+    private lazy var titleTotalLabel: UILabel = {
+        let variable = UILabel().labelTextTerciary()
+        variable.text = "Total de despeza"
+        return variable
+    }()
+    
+    private lazy var totalLabel: UILabel = {
+        let variable = UILabel().labelTextPrimary()
+        return variable
+    }()
     
     private lazy var tableView: UITableView = {
         let variable = UITableView()
         variable.translatesAutoresizingMaskIntoConstraints = false
         variable.separatorStyle = .none
         variable.showsVerticalScrollIndicator = true
+        //variable.transform = CGAffineTransform(scaleX: -, y: -1)
         variable.delegate = self
         variable.dataSource = self
         variable.register(ExpensesTableViewCellComponent.self, forCellReuseIdentifier: "cellid")
@@ -28,7 +60,8 @@ class ExpensesViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        setupNavigationBar(title: FormatterUtil.numberFormatter(number: repository.total))
+        totalLabel.text = FormatterUtil.numberFormatter(number: repository.total)
+        setupNavigationBar(title: "Expenses Track")
         setupSubViews()
         setupConstraints()
     }
@@ -43,12 +76,21 @@ class ExpensesViewController: UIViewController {
     }
     
     private func setupSubViews() {
+        view.addSubview(stackBalanceInfo)
         view.addSubview(tableView)
+        
+        stackBalance.addArrangedSubview(titleTotalLabel)
+        stackBalance.addArrangedSubview(totalLabel)
+        stackBalanceInfo.addArrangedSubview(stackBalance)
     }
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16.0),
+            stackBalanceInfo.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            stackBalanceInfo.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            stackBalanceInfo.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            tableView.topAnchor.constraint(equalTo: stackBalanceInfo.bottomAnchor, constant: 16.0),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
@@ -59,8 +101,9 @@ class ExpensesViewController: UIViewController {
         self.navigationItem.title = title
         let appearence = UINavigationBarAppearance()
         appearence.configureWithOpaqueBackground()
-        appearence.backgroundColor = UIColor(named: AssetsConstants.ligthGray)
+        appearence.backgroundColor = UIColor(named: AssetsConstants.appColor)
         appearence.titleTextAttributes = [.foregroundColor: UIColor.textColorPrimary]
+        appearence.shadowColor = UIColor.app
         navigationItem.standardAppearance = appearence
         navigationItem.scrollEdgeAppearance = appearence
         navigationItem.compactAppearance = appearence
@@ -83,7 +126,6 @@ extension ExpensesViewController: UITableViewDelegate, UITableViewDataSource {
         }
         
         cell.configureCell(expense: repository.expenses[indexPath.row])
-        
         return cell
     }
     
@@ -109,6 +151,10 @@ extension ExpensesViewController: ExpenseTableViewHeaderDelegate {
 }
 
 extension ExpensesViewController: ExpensesViewControllerDelegate {
+    func updateTotal() {
+        totalLabel.text = FormatterUtil.numberFormatter(number: repository.total)
+    }
+    
     func addExpense() {
         tableView.reloadData()
     }

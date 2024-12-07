@@ -25,6 +25,6 @@ class FormatterUtil {
         formatter.locale = Locale(identifier: "pt_BR")
         formatter.maximumFractionDigits = 2
         formatter.numberStyle = .decimal
-        return formatter.string(from: NSNumber(value: number)) ?? "error"
+        return "R$ " + formatter.string(from: NSNumber(value: number))!
     }
 }

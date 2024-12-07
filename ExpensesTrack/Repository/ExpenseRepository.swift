@@ -17,12 +17,13 @@ class ExpenseRepository {
         do {
             try context.save()
             expenses.append(expense as! Expense)
+            self.total = sumTotal()
         } catch {
             print("error ao salvar, erro: \(error)")
         }
     }
     
-    private func loadExpenses(for expense: Expense) {
+    func loadExpenses() {
         guard let delegate = UIApplication.shared.delegate as? AppDelegate else { return }
         let context = delegate.persistentContainer.viewContext
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Expense")
@@ -67,6 +68,6 @@ class ExpenseRepository {
     }
     
     init() {
-        loadExpenses(for: Expense())
+        loadExpenses()
     }
 }

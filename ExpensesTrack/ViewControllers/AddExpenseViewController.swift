@@ -149,7 +149,6 @@ class AddExpenseViewController: UIViewController {
     @objc private func tapSaveButton() {
         guard let title = titleTextField.text, !title.isEmpty else { return }
         guard let value = valueTextField.text, !value.isEmpty else { return }
-        guard category.isEmpty else { return }
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         
         let context = appDelegate.persistentContainer.viewContext
@@ -163,6 +162,7 @@ class AddExpenseViewController: UIViewController {
         newExpense.category = category
         
         repository.addExpense(expense: newExpense, context: context)
+        delegate?.updateTotal()
         delegate?.addExpense()
         dismiss(animated: true)
     }
