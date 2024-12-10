@@ -11,6 +11,8 @@ import CoreData
 class ExpenseRepository {
     var expenses: [Expense] = []
     var total: Double = 0
+    var totalExpenses: Double = 0
+    var totalEntrys: Double = 0
     
     func addExpense(expense: NSManagedObject, context: NSManagedObjectContext) {
         
@@ -62,9 +64,18 @@ class ExpenseRepository {
         var total: Double = 0
         for e in expenses {
             total += e.value
+            if e.value < 0 {
+                totalExpenses += e.value
+            } else if e.value > 0 {
+                totalEntrys += e.value
+            }
         }
         
         return total
+    }
+    
+    func getTotal() -> Double {
+        return sumTotal()
     }
     
     init() {

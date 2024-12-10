@@ -12,13 +12,13 @@ class AddExpenseViewController: UIViewController {
     weak var delegate: ExpensesViewControllerDelegate?
     var repository: ExpenseRepository
     var category: String = ""
+    var entry: Bool = false
     
     private lazy var stack: UIStackView = {
         let variable = UIStackView()
         variable.translatesAutoresizingMaskIntoConstraints = false
         variable.axis = .vertical
         variable.spacing = 10
-        variable.distribution = .equalCentering
         return variable
     }()
     
@@ -34,6 +34,7 @@ class AddExpenseViewController: UIViewController {
         variable.translatesAutoresizingMaskIntoConstraints = false
         variable.axis = .vertical
         variable.spacing = 10
+        variable.distribution = .equalSpacing
         return variable
     }()
     
@@ -45,9 +46,31 @@ class AddExpenseViewController: UIViewController {
         return variable
     }()
     
+    private lazy var stackEntry: UIStackView = {
+        let variable = UIStackView()
+        variable.translatesAutoresizingMaskIntoConstraints = false
+        variable.axis = .horizontal
+        variable.spacing = 10
+        return variable
+    }()
+    
     private lazy var categoyLabel: UILabel = {
         let variable = UILabel().labelTextSecondary()
         variable.text = "Categoria:"
+        return variable
+    }()
+    
+    private lazy var switchEntry: UISwitch = {
+        let variable = UISwitch()
+        variable.translatesAutoresizingMaskIntoConstraints = false
+        variable.tintColor = UIColor.textColorSecondary
+        variable.addTarget(self, action: #selector(didSwitchEntry), for: .valueChanged)
+        return variable
+    }()
+    
+    private lazy var entryLabel: UILabel = {
+        let variable = UILabel().labelTextSecondary()
+        variable.text = "Saída na carteira"
         return variable
     }()
     
@@ -131,8 +154,12 @@ class AddExpenseViewController: UIViewController {
         stackLabelsAndFields.addArrangedSubview(valueLabel)
         stackLabelsAndFields.addArrangedSubview(valueTextField)
         
+        stackEntry.addArrangedSubview(entryLabel)
+        stackEntry.addArrangedSubview(switchEntry)
+        
         stack.addArrangedSubview(infoLabel)
         stack.addArrangedSubview(stackCategory)
+        stack.addArrangedSubview(stackEntry)
         stack.addArrangedSubview(stackLabelsAndFields)
         stack.addArrangedSubview(buttonSave)
     }
@@ -142,7 +169,9 @@ class AddExpenseViewController: UIViewController {
             stack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 32.0),
             stack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16.0),
             stack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16.0),
-            stack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -32.0)
+            stack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -32.0),
+            
+            stackLabelsAndFields.heightAnchor.constraint(equalToConstant: 200),
         ])
     }
     
@@ -151,20 +180,35 @@ class AddExpenseViewController: UIViewController {
         guard let value = valueTextField.text, !value.isEmpty else { return }
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else { return }
         
+        var valueFormatted: Double = Double(value.replacingOccurrences(of: ",", with: "."))!
         let context = appDelegate.persistentContainer.viewContext
         let entity = NSEntityDescription.entity(forEntityName: "Expense", in: context)
         let newExpense = Expense(entity: entity!, insertInto: context)
         
+        if !entry {
+            valueFormatted = valueFormatted * -1
+        }
+        
         newExpense.id = UUID()
         newExpense.title = title
-        newExpense.value = Double(value.replacingOccurrences(of: ",", with: ".")) ?? 0
+        newExpense.value = valueFormatted
         newExpense.createdAt = Date.now
         newExpense.category = category
+        newExpense.entry = entry
         
         repository.addExpense(expense: newExpense, context: context)
         delegate?.updateTotal()
         delegate?.addExpense()
         dismiss(animated: true)
+    }
+    
+    @objc private func didSwitchEntry(_ sender: UISwitch) {
+        if sender.isOn {
+            entry = true
+            entryLabel.text = "Entrada na carteira"
+        } else {
+            entryLabel.text = "Saída na carteira"
+        }
     }
 
 }

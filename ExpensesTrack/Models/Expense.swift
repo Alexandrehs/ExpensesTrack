@@ -16,6 +16,7 @@ class Expense: NSManagedObject {
     @NSManaged var value: Double
     @NSManaged var createdAt: Date
     @NSManaged var category: String
+    @NSManaged var entry: Bool
 }
 
 enum Category: String, CaseIterable{
@@ -30,4 +31,6 @@ enum Category: String, CaseIterable{
     case GATOS
     case CASA
     case DENTISTA
+    case SALARIO
+    case OUTRO
 }

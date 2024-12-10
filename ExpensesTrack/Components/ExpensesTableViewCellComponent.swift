@@ -47,7 +47,7 @@ class ExpensesTableViewCellComponent: UITableViewCell {
     private lazy var expenseImageView: UIImageView = {
         let variable = UIImageView()
         variable.translatesAutoresizingMaskIntoConstraints = false
-        variable.backgroundColor = UIColor.textColorTerciary
+        variable.backgroundColor = UIColor.app
         variable.layer.cornerRadius = 20
         variable.clipsToBounds = true
         variable.heightAnchor.constraint(equalToConstant: 40.0).isActive = true
@@ -83,10 +83,10 @@ class ExpensesTableViewCellComponent: UITableViewCell {
     
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: topAnchor, constant: 16.0),
+            stack.topAnchor.constraint(equalTo: topAnchor, constant: 32.0),
             stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16.0),
             stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16.0),
-            stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16.0),
+            stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -32.0),
             stack.centerXAnchor.constraint(equalTo: centerXAnchor),
             stack.centerYAnchor.constraint(equalTo: centerYAnchor),
             stack.heightAnchor.constraint(equalToConstant: 40),
@@ -118,9 +118,16 @@ class ExpensesTableViewCellComponent: UITableViewCell {
     }
     
     func configureCell(expense: Expense) {
+        let valueText = FormatterUtil.numberFormatter(number: expense.value)
         titleLabel.text = expense.title
         categoryLabel.text = expense.category
-        valueLabel.text = FormatterUtil.numberFormatter(number: expense.value)
         createdAtLabel.text = FormatterUtil.dateFormatter(date: expense.createdAt)
+        
+        if expense.entry {
+            valueLabel.textColor = UIColor.textColorEntry
+            valueLabel.text = "+" + valueText
+        } else {
+            valueLabel.text = valueText
+        }
     }
 }
